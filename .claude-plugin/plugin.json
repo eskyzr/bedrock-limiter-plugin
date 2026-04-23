@@ -2,11 +2,7 @@
   "name": "bedrock-limiter",
   "description": "Claude Code の Bedrock 利用コストを日次・月次で制限するプラグイン",
   "version": "0.1.0",
-  "author": "",
-  "skills": [
-    {
-      "name": "cost-status",
-      "description": "現在の Bedrock 使用コストを表示"
-    }
-  ]
+  "author": {
+    "name": "uzresk"
+  }
 }
