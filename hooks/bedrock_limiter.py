@@ -289,6 +289,7 @@ def cmd_check(config: dict, litellm_pricing: dict):
     monthly_limit = config.get("monthly_limit_usd", 50.0)
     warn_pct = config.get("warn_percent", 80) / 100.0
 
+    warnings = []
     blocked = False
 
     if daily_cost >= daily_limit:
@@ -297,7 +298,7 @@ def cmd_check(config: dict, litellm_pricing: dict):
         blocked = True
     elif daily_cost >= daily_limit * warn_pct:
         pct = daily_cost / daily_limit * 100
-        print(f"⚠️  日次コスト警告: ${daily_cost:.4f} / ${daily_limit:.2f} ({pct:.0f}%)", file=sys.stderr)
+        warnings.append(f"⚠️ Bedrock 日次コスト警告: ${daily_cost:.4f} / ${daily_limit:.2f} ({pct:.0f}%)")
 
     if monthly_cost >= monthly_limit:
         print(f"⛔ 月次コスト上限超過: ${monthly_cost:.4f} / ${monthly_limit:.2f}", file=sys.stderr)
@@ -305,9 +306,21 @@ def cmd_check(config: dict, litellm_pricing: dict):
         blocked = True
     elif monthly_cost >= monthly_limit * warn_pct:
         pct = monthly_cost / monthly_limit * 100
-        print(f"⚠️  月次コスト警告: ${monthly_cost:.4f} / ${monthly_limit:.2f} ({pct:.0f}%)", file=sys.stderr)
+        warnings.append(f"⚠️ Bedrock 月次コスト警告: ${monthly_cost:.4f} / ${monthly_limit:.2f} ({pct:.0f}%)")
 
-    sys.exit(2 if blocked else 0)
+    if blocked:
+        sys.exit(2)
+
+    # 警告は additionalContext で会話に注入して表示する
+    if warnings:
+        print(json.dumps({
+            "hookSpecificOutput": {
+                "hookEventName": "UserPromptSubmit",
+                "additionalContext": "\n".join(warnings)
+            }
+        }))
+
+    sys.exit(0)
 
 
 # ---------------------------------------------------------------------------
