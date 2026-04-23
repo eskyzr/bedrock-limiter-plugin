@@ -1,0 +1,6 @@
+{
+  "daily_limit_usd": 5.0,
+  "monthly_limit_usd": 50.0,
+  "warn_percent": 80,
+  "bedrock_only": true
+}
