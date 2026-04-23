@@ -43,7 +43,7 @@ sudo apt-get install -y python3
 インストール後、初回のみ料金キャッシュを取得してください。
 
 ```bash
-python3 ~/.claude/plugins/cache/ie/bedrock-limiter/0.1.0/hooks/bedrock_limiter.py --update-pricing
+python3 ~/.claude/plugins/cache/ie/bedrock-limiter/0.1.1/hooks/bedrock_limiter.py --update-pricing
 ```
 
 ## 設定
@@ -69,7 +69,7 @@ python3 ~/.claude/plugins/cache/ie/bedrock-limiter/0.1.0/hooks/bedrock_limiter.p
 ## 使用量確認
 
 ```bash
-PLUGIN_ROOT=~/.claude/plugins/cache/ie/bedrock-limiter/0.1.0
+PLUGIN_ROOT=~/.claude/plugins/cache/ie/bedrock-limiter/0.1.1
 
 # コマンドラインから確認
 python3 $PLUGIN_ROOT/hooks/bedrock_limiter.py --status
