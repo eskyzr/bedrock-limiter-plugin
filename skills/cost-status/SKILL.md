@@ -1,7 +1,7 @@
 ---
 name: cost-status
 description: 現在の Bedrock 使用コスト（日次・月次）をターミナルに表示する
-version: 0.1.1
+version: 1.0.0
 ---
 
 以下のコマンドを実行して、現在の Bedrock 使用コストを表示してください:

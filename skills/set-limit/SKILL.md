@@ -1,7 +1,7 @@
 ---
 name: set-limit
 description: Bedrock コスト制限値（日次・月次・警告割合）を対話的に変更する
-version: 0.1.1
+version: 1.0.0
 ---
 
 以下の手順で Bedrock コスト制限の設定を変更してください。
