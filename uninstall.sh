@@ -8,20 +8,18 @@ if [ ! -f "$SETTINGS" ]; then
   exit 0
 fi
 
-python3 - <<PYEOF
-import json
-from pathlib import Path
+node - <<JSEOF
+const fs = require('fs');
+const settingsPath = "$SETTINGS";
+const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
 
-settings_path = Path("$SETTINGS")
-settings = json.loads(settings_path.read_text())
-
-hooks = settings.get("hooks", {})
-if "UserPromptSubmit" in hooks:
-    del hooks["UserPromptSubmit"]
-    if not hooks:
-        del settings["hooks"]
-    settings_path.write_text(json.dumps(settings, indent=2, ensure_ascii=False))
-    print("✅ UserPromptSubmit hook を削除しました")
-else:
-    print("hook は登録されていませんでした")
-PYEOF
+const hooks = settings.hooks || {};
+if ('UserPromptSubmit' in hooks) {
+  delete hooks.UserPromptSubmit;
+  if (Object.keys(hooks).length === 0) delete settings.hooks;
+  fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2));
+  console.log('✅ UserPromptSubmit hook を削除しました');
+} else {
+  console.log('hook は登録されていませんでした');
+}
+JSEOF
