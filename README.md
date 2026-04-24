@@ -40,7 +40,9 @@ sudo apt-get install -y python3
 
 ## セットアップ
 
-インストール後、初回のみ料金キャッシュを取得してください。
+インストール後、`/cost-status` を実行して動作確認してください。Python3 が未インストールの場合はスキルの指示に従ってインストールしてください。
+
+動作確認できたら、初回のみ料金キャッシュを取得してください。
 
 ```bash
 python3 ~/.claude/plugins/cache/ie/bedrock-limiter/1.0.0/hooks/bedrock_limiter.py --update-pricing
