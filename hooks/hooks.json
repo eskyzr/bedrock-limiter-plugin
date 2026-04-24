@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/bedrock_limiter.js"
+            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/bedrock_limiter.py"
           }
         ]
       }
