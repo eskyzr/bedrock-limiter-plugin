@@ -6,4 +6,4 @@ case "$ARCH" in
   x86_64)          ARCH="amd64" ;;
   aarch64 | arm64) ARCH="arm64" ;;
 esac
-exec "${CLAUDE_PLUGIN_ROOT}/bin/bedrock-limiter-${OS}-${ARCH}" "$@"
+exec "${CLAUDE_PLUGIN_ROOT}/go/bin/bedrock-limiter-${OS}-${ARCH}" "$@"
