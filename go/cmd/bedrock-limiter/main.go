@@ -85,12 +85,12 @@ func pluginRoot() string {
 	if root := os.Getenv("CLAUDE_PLUGIN_ROOT"); root != "" {
 		return root
 	}
-	// bin/bedrock-limiter-xxx → plugin root
+	// go/bin/bedrock-limiter-xxx → go/bin → go → plugin root
 	exe, err := os.Executable()
 	if err != nil {
 		return "."
 	}
-	return filepath.Dir(filepath.Dir(exe))
+	return filepath.Dir(filepath.Dir(filepath.Dir(exe)))
 }
 
 func configFile() string    { return filepath.Join(pluginRoot(), "config.json") }
