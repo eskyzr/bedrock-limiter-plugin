@@ -5,22 +5,14 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-HOOK_SCRIPT="$SCRIPT_DIR/hooks/bedrock_limiter.py"
+HOOK_SCRIPT="$SCRIPT_DIR/hooks/bedrock_limiter.sh"
 SETTINGS="$HOME/.claude/settings.json"
 
 echo "=== Claude Code Bedrock Limiter インストール ==="
 
-# Python3 確認
-if ! command -v python3 &>/dev/null; then
-  echo "❌ Python3 が見つかりません。インストールしてください。"
-  exit 1
-fi
-
-# 実行権限付与
 chmod +x "$HOOK_SCRIPT"
 echo "✅ $HOOK_SCRIPT に実行権限を付与しました"
 
-# settings.json バックアップ & hook 追加
 if [ ! -f "$SETTINGS" ]; then
   echo "{}" > "$SETTINGS"
 fi
@@ -28,32 +20,40 @@ fi
 cp "$SETTINGS" "$SETTINGS.bak"
 echo "✅ $SETTINGS をバックアップしました ($SETTINGS.bak)"
 
-python3 - <<PYEOF
-import json
-from pathlib import Path
+# settings.json に hook を追加（Python / Node が不要な純粋シェル実装）
+HOOK_JSON=$(cat <<EOF
+{"hooks":{"UserPromptSubmit":[{"hooks":[{"type":"command","command":"$HOOK_SCRIPT"}]}]}}
+EOF
+)
 
-settings_path = Path("$SETTINGS")
-settings = json.loads(settings_path.read_text()) if settings_path.exists() else {}
-
-settings.setdefault("hooks", {})
-settings["hooks"]["UserPromptSubmit"] = [
-    {
-        "hooks": [
-            {
-                "type": "command",
-                "command": "python3 $HOOK_SCRIPT"
-            }
-        ]
-    }
-]
-
-settings_path.write_text(json.dumps(settings, indent=2, ensure_ascii=False))
-PYEOF
+# jq があれば使い、なければ python3 / node でマージ
+if command -v jq &>/dev/null; then
+  jq --argjson hook "$HOOK_JSON" '. * $hook' "$SETTINGS" > "$SETTINGS.tmp" && mv "$SETTINGS.tmp" "$SETTINGS"
+elif command -v python3 &>/dev/null; then
+  python3 -c "
+import json, sys
+s = json.load(open('$SETTINGS'))
+s.setdefault('hooks', {})['UserPromptSubmit'] = [{'hooks': [{'type': 'command', 'command': '$HOOK_SCRIPT'}]}]
+json.dump(s, open('$SETTINGS', 'w'), indent=2)
+"
+elif command -v node &>/dev/null; then
+  node -e "
+const fs = require('fs');
+const s = JSON.parse(fs.readFileSync('$SETTINGS', 'utf8'));
+(s.hooks = s.hooks || {}).UserPromptSubmit = [{hooks:[{type:'command',command:'$HOOK_SCRIPT'}]}];
+fs.writeFileSync('$SETTINGS', JSON.stringify(s, null, 2));
+"
+else
+  echo "⚠️  jq / python3 / node のいずれも見つかりません。"
+  echo "    $SETTINGS を手動で編集して UserPromptSubmit hook を追加してください。"
+  echo "    コマンド: $HOOK_SCRIPT"
+  exit 1
+fi
 
 echo "✅ ~/.claude/settings.json に UserPromptSubmit hook を登録しました"
 echo ""
 echo "=== インストール完了 ==="
 echo ""
 echo "設定ファイル: $SCRIPT_DIR/config.json (初回起動時に自動生成)"
-echo "コスト確認:   python3 $HOOK_SCRIPT --status"
+echo "コスト確認:   $HOOK_SCRIPT --status"
 echo "アンインストール: bash $SCRIPT_DIR/uninstall.sh"
