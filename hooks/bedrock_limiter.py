@@ -294,7 +294,9 @@ def cmd_check(config: dict, litellm_pricing: dict):
 
     if daily_cost >= daily_limit:
         print(f"⛔ 日次コスト上限超過: ${daily_cost:.4f} / ${daily_limit:.2f}", file=sys.stderr)
-        print(f"   config.json の daily_limit_usd を変更するか、明日以降に再開してください。", file=sys.stderr)
+        print(f"   上限を上げるには以下のファイルの daily_limit_usd を編集してください:", file=sys.stderr)
+        print(f"   {CONFIG_FILE}", file=sys.stderr)
+        print(f"   （または明日以降に再開してください）", file=sys.stderr)
         blocked = True
     elif daily_cost >= daily_limit * warn_pct:
         pct = daily_cost / daily_limit * 100
@@ -302,7 +304,9 @@ def cmd_check(config: dict, litellm_pricing: dict):
 
     if monthly_cost >= monthly_limit:
         print(f"⛔ 月次コスト上限超過: ${monthly_cost:.4f} / ${monthly_limit:.2f}", file=sys.stderr)
-        print(f"   config.json の monthly_limit_usd を変更するか、来月以降に再開してください。", file=sys.stderr)
+        print(f"   上限を上げるには以下のファイルの monthly_limit_usd を編集してください:", file=sys.stderr)
+        print(f"   {CONFIG_FILE}", file=sys.stderr)
+        print(f"   （または来月以降に再開してください）", file=sys.stderr)
         blocked = True
     elif monthly_cost >= monthly_limit * warn_pct:
         pct = monthly_cost / monthly_limit * 100
