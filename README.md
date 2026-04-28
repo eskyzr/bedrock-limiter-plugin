@@ -89,7 +89,7 @@ PLUGIN_ROOT=~/.claude/plugins/cache/eskyzr/bedrock-limiter/0.1.0
 
 - Claude Code 経由の Bedrock 呼び出しのみ追跡します（SDK 直接呼び出しは対象外）
 - transcript JSONL のタイムスタンプは UTC です
-- 表示コストは推計値です。実際の請求額は AWS コンソールで確認してください
+- 表示コストはあくまで目安です。実際の請求額は [AWS Cost Explorer](https://aws.amazon.com/aws-cost-management/aws-cost-explorer/) で確認してください
 - 料金データの最新値は [AWS Bedrock 料金ページ](https://aws.amazon.com/bedrock/pricing/) を参照してください
 
 ## devcontainer での利用
