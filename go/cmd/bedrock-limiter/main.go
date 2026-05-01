@@ -347,14 +347,16 @@ func cmdUpdatePricing() {
 
 func cmdStatus(cfg appConfig, pricing map[string]modelPricing) {
 	today, month := localDateStrings()
-	daily, monthly := scanCosts(today, month, pricing, cfg.BedrockOnly)
+	prevMonth := time.Now().AddDate(0, -1, 0).Format("2006-01")
 
-	dailyRatio, monthlyRatio := 0.0, 0.0
-	if cfg.DailyLimitUSD > 0 {
-		dailyRatio = daily / cfg.DailyLimitUSD
-	}
-	if cfg.MonthlyLimitUSD > 0 {
-		monthlyRatio = monthly / cfg.MonthlyLimitUSD
+	daily, monthly := scanCosts(today, month, pricing, cfg.BedrockOnly)
+	_, prevMonthly := scanCosts("", prevMonth, pricing, cfg.BedrockOnly)
+
+	ratio := func(cost, limit float64) float64 {
+		if limit > 0 {
+			return cost / limit
+		}
+		return 0
 	}
 
 	modeLabel := "Bedrock のみ"
@@ -368,9 +370,11 @@ func cmdStatus(cfg appConfig, pricing map[string]modelPricing) {
 
 	fmt.Printf("集計対象: %s  |  料金データ: %s\n", modeLabel, cacheLabel)
 	fmt.Printf("今日の使用コスト:  $%.4f / $%.2f (%.1f%%)  [%s]\n",
-		daily, cfg.DailyLimitUSD, dailyRatio*100, buildBar(dailyRatio, 20))
+		daily, cfg.DailyLimitUSD, ratio(daily, cfg.DailyLimitUSD)*100, buildBar(ratio(daily, cfg.DailyLimitUSD), 20))
 	fmt.Printf("今月の使用コスト:  $%.4f / $%.2f (%.1f%%) [%s]\n",
-		monthly, cfg.MonthlyLimitUSD, monthlyRatio*100, buildBar(monthlyRatio, 20))
+		monthly, cfg.MonthlyLimitUSD, ratio(monthly, cfg.MonthlyLimitUSD)*100, buildBar(ratio(monthly, cfg.MonthlyLimitUSD), 20))
+	fmt.Printf("先月の使用コスト:  $%.4f / $%.2f (%.1f%%) [%s]\n",
+		prevMonthly, cfg.MonthlyLimitUSD, ratio(prevMonthly, cfg.MonthlyLimitUSD)*100, buildBar(ratio(prevMonthly, cfg.MonthlyLimitUSD), 20))
 	fmt.Printf("\n設定ファイル: %s\n", configFile())
 	fmt.Printf("料金更新:     %s --update-pricing\n", os.Args[0])
 }
